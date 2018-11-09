@@ -31,7 +31,7 @@ angular 7.0.4
                 BrowserModule,
                 AppRoutingModule,
                 AgmCoreModule.forRoot({
-                    apiKey: 'AIzaSyC8JfdxUutJ8V60GtQnmGjx3qtFQyg9cH0'
+                    apiKey: 'asAdsaglijkjlkh6dfsdfsdf65466ASSdsfMMCIKDNcmxcvxjj7'
                 }),
             ],
 
