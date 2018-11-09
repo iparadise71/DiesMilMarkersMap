@@ -1,0 +1,26 @@
+<agm-map id="start-gmap"
+         [latitude]="lat"
+         [longitude]="lng"
+         [zoom]="14"
+         (mapReady)="mapReady($event)"
+         (idle)="setBounds()"
+         [mapTypeControl]="true"
+         [mapTypeControlOptions]="mapOptions"
+         [zoomControlOptions]="zoomPosition"
+         [streetViewControlOptions]="zoomPosition"
+>
+    <!--<ng-container *ngFor="let ubication of this.historicDataInMap; let dat = index">-->
+        <!--<agm-marker-->
+            <!--[latitude]="ubication.latitud"-->
+            <!--[longitude]="ubication.longitud"-->
+            <!--[visible]="ubication.puntoActivo"-->
+            <!--[iconUrl]="iconStateVierwer(ubication, dat)"-->
+            <!--(markerClick)="selectedMarckerMap(ubication.movInfoHist, dat)"-->
+        <!--&gt;-->
+        <!--</agm-marker>-->
+    <!--</ng-container>-->
+</agm-map>
+
+<div>
+
+</div>
