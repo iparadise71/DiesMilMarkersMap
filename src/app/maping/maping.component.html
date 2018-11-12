@@ -1,3 +1,11 @@
+<div class="span12">
+    <button class="span2 btn btn-success" (click)="addMarckers()">agregar marckers</button>
+    <button class="span2 btn btn-warning" (click)="clearMarkers()">Ocultar marckers</button>
+    <button class="span2 btn btn-primary" (click)="deleteMarkers()">borrar marckers</button>
+    <button class="span2 btn btn-info" (click)="drop()">PLAY</button>
+    <button class="span2 btn btn-success" (click)="pauseMarckers()">PAUSE</button>
+    <button class="span2 btn btn-danger" (click)="deleteMarkers()">STOP</button>
+</div>
 <agm-map id="start-gmap"
          [latitude]="lat"
          [longitude]="lng"
@@ -21,6 +29,3 @@
     <!--</ng-container>-->
 </agm-map>
 
-<div>
-
-</div>

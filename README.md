@@ -42,3 +42,6 @@ angular 7.0.4
     
     npm install --save @types/googlemaps
 
+- TEMPLATE
+
+    http://aozora.github.io/bootplus/getting-started.html
