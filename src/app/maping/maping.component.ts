@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {MapsAPILoader} from '@agm/core';
+import {LatLngBounds, MapsAPILoader} from '@agm/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {CONSTANT} from '../contantView';
-import {forEach} from '@angular/router/src/utils/collection';
 import {el} from '@angular/platform-browser/testing/src/browser_util';
 declare var google: any;
 @Component({
@@ -17,7 +16,6 @@ export class MapingComponent implements OnInit {
     ) {
 
     }
-
     public constant = CONSTANT;
     public lat = -17.383348;
     public lng = -66.184204;
@@ -26,14 +24,21 @@ export class MapingComponent implements OnInit {
     public map;
     public listMarckers: any;
     public markers = [];
-
-    public positionArray = 0;
-    public stateArray = false;
+    public auxMarkers = [];
+    public idMarckerSelected = 10;
     public events = [];
-
-    public iconSelected = false;
     public idIconSelected = 0;
-    public previusIcon;
+    public sourceSelected = false;
+    public iconSelected = false;
+    public latlngBoundsGeo: LatLngBounds;
+
+    public id;
+    public interval = 200;
+    public positionPlay = 0;
+    public positionPreviusPlay = 0;
+    public lengthPlay = 0;
+    public statePlay = 0;
+
     ngOnInit() {
         this.httpService.get('assets/datos.json').subscribe(
             data => {
@@ -49,33 +54,38 @@ export class MapingComponent implements OnInit {
     }
 
     public mapReady(map) {
-        console.log('*********************************************************');
-        console.log(map);
+        console.log('**********');
         this.map = map;
-        // this.map.data.setMapOnAll(null);
     }
 
     setBounds() {
         console.log('EVENTOS BUSCADO');
     }
 
+    prepareMarkers(){
+        console.log('11111111');
+        for (let i = 0; i < this.listMarckers.length; i++) {
+            const x = this.listMarckers[i];
+            if (this.events.find((r) => r.codeEventKey === x.codEvento).codeEventState === true) {
+                this.auxMarkers.push(x);
+            }
+        }
+        console.log('222222222');
+        this.addMarckers();
+        console.log('333333333');
+    }
     addMarckers() {
         let activeMarker;
         let originMarker;
-        let codeEvent;
         let oldIcon;
         let oldZIndex;
-        let oldPosition = 0;
-        const arrayJ = this.listMarckers;
-        const maxZIndex = this.listMarckers.length + this.listMarckers.length;
-        for (let i = 0; i < this.listMarckers.length; i++) {
-            const x = this.listMarckers[i];
-            codeEvent = x.codEvento;
-            oldPosition = i;
+        const maxZIndex = this.auxMarkers.length + this.auxMarkers.length;
+        for (let i = 0; i < this.auxMarkers.length; i++) {
+            const x = this.auxMarkers[i];
             let iconLabel = '';
             if (i === 0) {
                 iconLabel = 'assets/img/m_star.png';
-            } else if (i === this.listMarckers.length - 1) {
+            } else if (i === this.auxMarkers.length - 1) {
                 iconLabel = 'assets/img/m_end.png';
             } else {
                 iconLabel = this.events.find((r) => r.codeEventKey === x.codEvento).icon;
@@ -88,69 +98,77 @@ export class MapingComponent implements OnInit {
                 clickable: true,
                 map: this.map
             });
-            google.maps.event.addListener(marker, 'click', ( (marker, i) => {
+            google.maps.event.addListener(marker, 'click', ( ( marker, i ) => {
                 return () => {
-                    console.log('--------------------------------------------------');
-                    console.log(i);
-                    console.log(marker);
-                    console.log(x);
-                    console.log(oldIcon);
-                    console.log(oldZIndex);
-                    console.log(maxZIndex);
-                    console.log(marker.getIcon());
-                    if(this.idIconSelected !== 0){
-                        marker.setIcon(this.events.find((r) => r.codeEventKey === this.listMarckers[this.idIconSelected].codEvento).icon);
+                    if (this.sourceSelected) {
+                        console.log('*---------CAMBIANDO A TODOS LOS MARKERS INTERNO----------*');
+                        this.sourceSelected = false;
+                        if (this.iconSelected) {
+                            this.resetMarkerSelected();
+                        }
                     }
                     activeMarker && activeMarker.setIcon(oldIcon);
                     activeMarker && activeMarker.setZIndex(oldZIndex);
                     oldIcon = marker.getIcon();
                     oldZIndex = marker.getZIndex();
-                    if (i !== oldPosition) {
-                        oldPosition = i;
-                        marker.setIcon('assets/img/m_selected.png');
-                    } else {
-                        oldPosition = 0;
-                        console.log('DESELECCIONADO');
-                    }
+                    this.markerSelector(this.idIconSelected, i);
                     marker.setZIndex(maxZIndex);
                     activeMarker = marker;
-                    this.markerssss();
                 };
             })(marker, i));
-            // google.maps.event.addListener(marker, 'click', () => {
-            //         console.log(codeEvent);
-            //         console.log(oldPosition);
-            //         console.log(arrayJ);
-            //         this.selectMarker(oldPosition);
-            // });
             this.markers.push(marker);
         }
+        this.fitBounds(this.auxMarkers);
         console.log('marckers agregados ' + this.listMarckers.length);
+        console.log('marckers VALIDOS ' + this.auxMarkers.length);
     }
-    markerssss(){
-        console.log('LIMPIANDO');
-    }
+
     selectMarker(id) {
-        console.log(this.idIconSelected);
-        console.log(id);
-
-        if (this.idIconSelected === id) {
-            console.log('RESTAURANDO');
-            this.markers[id].setIcon(this.events.find((r) => r.codeEventKey === this.listMarckers[id].codEvento).icon);
-            this.idIconSelected = 0;
-        } else {
-            console.log('MARCANDO');
-            this.markers[id].setIcon('assets/img/m_selected.png');
-            this.idIconSelected = id;
+        console.log('*---------CAMBIANDO A TODOS LOS MARKERS EXTERNO----------*');
+        console.log(this.sourceSelected + ' -- ' + this.iconSelected);
+        if (!this.sourceSelected) {
+            this.sourceSelected = true;
         }
-
-        console.log('---------------------');
-        console.log(this.idIconSelected);
-        console.log(id);
+        if (this.iconSelected) {
+            this.resetMarkerSelected();
+        }
+        this.markerSelector(this.idIconSelected, id);
     }
-    // Removes the markers from the map, but keeps them in the array.
+
+    markerSelector(idGlobal, idIcon) {
+        if (idGlobal === idIcon) {
+            console.log(idGlobal + ' -- ' + idIcon);
+            console.log('RESTAURANDO');
+            this.markers[idIcon].setIcon(this.events.find((r) => r.codeEventKey === this.auxMarkers[idIcon].codEvento).icon);
+            this.idIconSelected = 0;
+            this.iconSelected = false;
+        } else {
+            console.log(idGlobal + ' -- ' + idIcon);
+            console.log('MARCANDO');
+            this.markers[idIcon].setIcon('assets/img/m_selected.png');
+            this.idIconSelected = idIcon;
+            this.iconSelected = true;
+        }
+    }
+    resetMarkerSelected() {
+        for (const i in this.auxMarkers) {
+            const coors = this.auxMarkers[i];
+            if (this.markers[i].getIcon() === 'assets/img/m_selected.png') {
+                this.markers[i].setIcon(this.events.find((r) => r.codeEventKey === coors.codEvento).icon);
+            }
+        }
+    }
+
+    deleteMarkers() {
+        this.setMapOnAll(null);
+        this.markers = [];
+        this.idIconSelected = 0;
+        this.iconSelected = false;
+    }
     clearMarkers() {
         this.setMapOnAll(null);
+        this.idIconSelected = 0;
+        this.iconSelected = false;
     }
     setMapOnAll(map) {
         for (let i = 0; i < this.markers.length; i++) {
@@ -158,56 +176,55 @@ export class MapingComponent implements OnInit {
             x.setMap(map);
         }
     }
-
-    deleteMarkers() {
-        this.clearMarkers();
-        this.markers = [];
-        this.positionArray = 0;
-    }
-
-
-
-    pauseMarckers() {
-        this.stateArray = true;
-    }
-    drop() {
-        this.clearMarkers();
-        this.positionArray = this.listMarckers.length;
-        for (let i = 0; i < this.positionArray; i++) {
-            const x = this.listMarckers[i];
-            this.addMarkerWithTimeout(x, i * 200, i);
-            if (this.stateArray) {
-                this.positionArray = i;
-                break;
+    fitBounds(list) {
+        this.mapsAPILoader.load().then(() => {
+            this.latlngBoundsGeo = new window['google'].maps.LatLngBounds();
+            for (const x of list) {
+                this.latlngBoundsGeo.extend(new google.maps.LatLng(
+                    { lat: x.latitud, lng: x.longitud }
+                ));
             }
+            this.map.fitBounds(this.latlngBoundsGeo);
+        });
+    }
+    playMarkers() {
+        if(this.statePlay === 0){
+            this.setMapOnAll(null);
         }
+        this.lengthPlay = this.auxMarkers.length;
+        console.log('Reproducir MARKERS ' + this.positionPlay);
+        this.id = setInterval(() => {
+            console.log('MARKERS ANTES' + this.positionPlay + ' -- ' + this.positionPreviusPlay);
+            this.positionPreviusPlay = this.positionPlay;
+            if(this.positionPlay === 0){
+                this.markers[this.positionPlay].setMap(this.map);
+                this.positionPlay = this.positionPlay + 1;
+            }else if(this.positionPlay === this.lengthPlay){
+                this.markers[this.positionPlay].setMap(this.map);
+                clearInterval(this.id);
+            }else {
+                this.resetMarkerSelected();
+                this.markers[this.positionPlay].setIcon('assets/img/m_selected.png');
+                this.markers[this.positionPlay].setMap(this.map);
+                this.positionPlay = this.positionPlay + 1;
+            }
+            console.log('MARKERS DESPUES' + this.positionPlay + ' -- ' + this.positionPreviusPlay);
+        }, this.interval);
     }
 
-    addMarkerWithTimeout(x, timeout, i) {
-        setTimeout(() => {
-            const x = this.listMarckers[i];
-            let iconLabel = '';
-            if (i === 0) {
-                iconLabel = 'assets/img/m_star.png';
-            } else if (i === this.listMarckers.length - 1) {
-                iconLabel = 'assets/img/m_selected.png';
-            } else {
-                iconLabel = 'assets/img/m_mnn.png';
-            }
-            const marker = new google.maps.Marker({
-                position: new google.maps.LatLng(x.latitud, x.longitud),
-                icon: iconLabel,
-                visible: true,
-                clickable: true,
-                zIndex: i,
-                map: this.map
-            });
-            this.markers.push(marker);
-            console.log(x);
-            console.log(i);
-        }, timeout);
-        // this.id = setInterval(() => {
-        //
-        // }, timeout);
+    pauseMarkers(){
+        console.log('PAUSANDO REPROCUCCION MARKERS ');
+        clearInterval(this.id);
+        this.statePlay = 1;
     }
+    stopMarkers() {
+        console.log('PARANDO REPROCUCCION MARKERS ');
+        console.log('MOSTRAR TODO');
+        clearInterval(this.id);
+        this.setMapOnAll(this.map);
+        this.positionPlay = 0;
+        this.lengthPlay = 0;
+        this.statePlay = 0;
+    }
+
 }

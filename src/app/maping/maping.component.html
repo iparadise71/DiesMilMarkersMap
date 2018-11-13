@@ -1,12 +1,19 @@
 <div class="span12">
-    <button class="span2 btn btn-success" (click)="addMarckers()">agregar marckers</button>
+    <button class="span2 btn btn-success" (click)="prepareMarkers()">agregar marckers</button>
     <button class="span2 btn btn-warning" (click)="clearMarkers()">Ocultar marckers</button>
     <button class="span2 btn btn-primary" (click)="deleteMarkers()">borrar marckers</button>
-    <button class="span2 btn btn-info" (click)="drop()">PLAY</button>
-    <button class="span2 btn btn-success" (click)="pauseMarckers()">PAUSE</button>
-    <button class="span2 btn btn-danger" (click)="deleteMarkers()">STOP</button>
-    <button class="span2 btn btn-primary" (click)="selectMarker(23)">SELECCIONAR</button>
+
+    <button class="span2 btn btn-primary" (click)="selectMarker(idMarckerSelected)">SELECCIONAR</button>
+    <input class="span2" id="popupState" name="veremos" type="number" [(ngModel)]="idMarckerSelected" [ngModelOptions]="{standalone: true}">
+    <label> 10348 markers en GOOGLE MAPS Angular 7 </label>
+    <label class="text-success"> iparadise71 TEAM </label>
 </div>
+<div class="span12">
+    <button class="span2 btn btn-info" (click)="playMarkers()">PLAY</button>
+    <button class="span2 btn btn-success" (click)="pauseMarkers()">PAUSE</button>
+    <button class="span2 btn btn-danger" (click)="stopMarkers()">STOP</button>
+</div>
+
 <agm-map id="start-gmap"
          [latitude]="lat"
          [longitude]="lng"
@@ -18,15 +25,5 @@
          [zoomControlOptions]="zoomPosition"
          [streetViewControlOptions]="zoomPosition"
 >
-    <!--<ng-container *ngFor="let ubication of this.historicDataInMap; let dat = index">-->
-        <!--<agm-marker-->
-            <!--[latitude]="ubication.latitud"-->
-            <!--[longitude]="ubication.longitud"-->
-            <!--[visible]="ubication.puntoActivo"-->
-            <!--[iconUrl]="iconStateVierwer(ubication, dat)"-->
-            <!--(markerClick)="selectedMarckerMap(ubication.movInfoHist, dat)"-->
-        <!--&gt;-->
-        <!--</agm-marker>-->
-    <!--</ng-container>-->
 </agm-map>
 
