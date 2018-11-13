@@ -1,5 +1,5 @@
 DiesMilMarkersMap
-![alt text](img.png)
+![Screenshot](example.png)
 angular 7.0.4
 
     | Scaffold  | Usage                           |
