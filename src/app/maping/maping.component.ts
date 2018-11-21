@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {LatLngBounds, MapsAPILoader} from '@agm/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {CONSTANT} from '../contantView';
-import {el} from '@angular/platform-browser/testing/src/browser_util';
+import {ILEvent} from 'angular-infinite-list';
+import {Subject} from 'rxjs';
 declare var google: any;
 @Component({
     selector: 'app-maping',
@@ -38,7 +39,6 @@ export class MapingComponent implements OnInit {
     public positionPreviusPlay = 0;
     public lengthPlay = 0;
     public statePlay = 0;
-
     ngOnInit() {
         this.httpService.get('assets/datos.json').subscribe(
             data => {

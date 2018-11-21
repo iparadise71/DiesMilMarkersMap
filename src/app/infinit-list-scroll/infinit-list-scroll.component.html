@@ -1,0 +1,35 @@
+<div class="span12">
+    <button class="span2 btn btn-info" (click)="setPositionIndex(150)"> AL 150</button>
+    <button class="span2 btn btn-success" (click)="setPositionIndex(7845)">7845</button>
+    <button class="span2 btn btn-danger" (click)="setPositionIndex('n')">DESELECCIONAR</button>
+</div>
+<div class="span12">
+    <div class="span6">
+        <input type="number" matInput (input)="input()" [(ngModel)]="scrollToIndex" placeholder="Scroll to index">
+    </div>
+    <div class="span6" style="margin-left:20px;">
+        <select  [(ngModel)]="scrollToAlignment">
+            <option *ngFor="let opt of opts" [value]="opt">
+                {{ opt }}
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="span12" style="background: #0e90d2" *ngIf="listMarckers.length > 0">
+    <infinitelist
+        [width]='"100%"'
+        [height]='"450px"'
+        [data]='listMarckers'
+        [scrollToIndex]='scrollToIndex'
+        [scrollToAlignment]='scrollToAlignment'
+        [itemSize]='120'
+        [useob]='true'
+        (update)='update($event)'>
+        <div class="li-con" style="margin: 3px" [ngClass]="getClass(event.start+i)" *ngFor="let item of event?.items; let i=index;" [ngStyle]="event.getStyle(i)">
+            <div style="display: flex">
+                item{{event.start + i}} : {{item|json}}
+            </div>
+        </div>
+    </infinitelist>
+</div>
